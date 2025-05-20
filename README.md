@@ -7,7 +7,7 @@
 
 `BazerData.jl` is a placeholder package for some functions that I use in julia frequently.
 
-So far the package provides a four functions
+So far the package provides a five functions
 
   1. tabulate some data ([`tabulate`](#tabulate-data))
   2. create category based on quantile ([`xtile`](#xtile))
@@ -107,38 +107,17 @@ panel_fill(df_panel, :id, :t, [:v1, :v2, :v3],
 
 ### Leads and lags
 This is largely "borrowed" (copied) from @FuZhiyu [`PanelShift.jl`](https://github.com/FuZhiyu/PanelShift.jl) package.
+See the tests for more examples.
 
 ```julia
-t, v = [1;2;4], [1;2;3];
-julia> tlag(t, v) # the default lag period is the unitary difference in t, here 1
-3-element Vector{Union{Missing, Int64}}:
-  missing
- 1
-  missing
+x, t = [1, 2, 3], [1, 2, 4]
+tlag(x, t) 
+tlag(x, t, n=2) 
 
-
-julia> tlag(t, v, 2) # we can also specify lags using the third argument
-3-element Vector{Union{Missing, Int64}}:
-  missing
-  missing
- 2
-
-
-julia> using Dates;
-julia> t = [Date(2020,1,1); Date(2020,1,2); Date(2020,1,4)];
-julia> tlag(t, [1, 2, 3]) # customized types of the time vector are also supported 
-3-element Vector{Union{Missing, Int64}}:
-  missing
- 1
-  missing
-
-
-julia> tlag(t, [1, 2, 3], Day(2)) # specify two-day lags
-3-element Vector{Union{Missing, Int64}}:
-  missing
-  missing
- 2
-
+using Dates;
+t = [Date(2020,1,1); Date(2020,1,2); Date(2020,1,4)];
+tlag(x, t)
+tlag(x, t, n=Day(2)) # specify two-day lags
 ```
 
 
