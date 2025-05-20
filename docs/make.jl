@@ -12,20 +12,25 @@ using DocumenterVitepress
 
 # -- 
 makedocs(
-    # format = Documenter.HTML(),
-    format = MarkdownVitepress(
-        repo = "https://github.com/eloualiche/BazerData.jl",
-        devurl = "dev",
-        devbranch = "build",
-        deploy_url = "eloualiche.github.io/BazerData.jl",
-        description = "BazerData.jl",
+    format = Documenter.HTML(
+        size_threshold = 512_000,          # KiB — raise above your largest file
+        size_threshold_warn = 256_000,     # optional
+        example_size_threshold = 200_000,  # bytes — for large @example blocks
     ),
-    repo = Remotes.GitHub("eloualiche", "BazerData.jl"),
+    # format = MarkdownVitepress(
+    #     repo = "https://github.com/eloualiche/BazerData.jl",
+    #     devurl = "dev",
+    #     devbranch = "build",
+    #     deploy_url = "eloualiche.github.io/BazerData.jl",
+    #     description = "BazerData.jl",
+    # ),
+    # repo = Remotes.GitHub("eloualiche", "BazerData.jl"),
     sitename = "BazerData.jl",
     modules  = [BazerData],
     authors = "Erik Loualiche",
-    version = "0.7.1",
+    # version = "0.7.1",
     # version = "dev",
+    version = "",
     pages=[
         "Home" => "index.md",
         "Manual" => [
@@ -39,24 +44,25 @@ makedocs(
             "lib/public.md",
             "lib/internals.md"
         ]
-    ]
+    ],
+
 )
 
 
 deploydocs(;
     repo = "github.com/eloualiche/BazerData.jl",
     target = "build", # this is where Vitepress stores its output
-    devbranch = "main",
+    # devbranch = "main",
     branch = "gh-pages",
     push_preview = true,
     # versions = ["dev"]  # This specifies which versions to deploy
 )
 
 
-# deploydocs(;
-#     repo = "github.com/eloualiche/BazerData.jl",
-#     devbranch = "build",
-# )
+deploydocs(;
+    repo = "github.com/eloualiche/BazerData.jl",
+    devbranch = "build",
+)
 
 # deploydocs(;
 #     repo = "github.com/eloualiche/BazerData.jl",
