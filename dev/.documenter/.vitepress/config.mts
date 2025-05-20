@@ -11,7 +11,7 @@ function getBaseRepository(base: string): string {
 }
 
 const baseTemp = {
-  base: '/BazerData.jl/dev/',// TODO: replace this in makedocs!
+  base: '/eloualiche.github.io/BazerData.jl/',// TODO: replace this in makedocs!
 }
 
 const navTemp = {
@@ -41,9 +41,9 @@ const nav = [
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: '/BazerData.jl/dev/',// TODO: replace this in makedocs!
+  base: '/eloualiche.github.io/BazerData.jl/',// TODO: replace this in makedocs!
   title: 'BazerData.jl',
-  description: 'Documentation for BazerData.jl',
+  description: 'BazerData.jl',
   lastUpdated: true,
   cleanUrls: true,
   outDir: '../1', // This is required for MarkdownVitepress to work correctly...
@@ -56,7 +56,7 @@ export default defineConfig({
   
   vite: {
     define: {
-      __DEPLOY_ABSPATH__: JSON.stringify('/BazerData.jl'),
+      __DEPLOY_ABSPATH__: JSON.stringify('/eloualiche.github.io/BazerData.jl'),
     },
     resolve: {
       alias: {
@@ -114,7 +114,7 @@ export default defineConfig({
  }
 ]
 ,
-    editLink: { pattern: "https://https://github.com/eloualiche/BazerData.jl/edit/main/docs/src/:path" },
+    editLink: { pattern: "https://https://github.com/eloualiche/BazerData.jl/edit/build/docs/src/:path" },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/eloualiche/BazerData.jl' }
     ],

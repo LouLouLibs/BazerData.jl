@@ -15,7 +15,7 @@ Same as panel_fill but with modification in place
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/9b054ace04a8aa21364bde899385112e8c6af2e5/src/PanelData.jl#L151-L156" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/5faeb3e704b567c33dd3eef7c43492095f8b855a/src/PanelData.jl#L151-L156" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -70,7 +70,7 @@ panel_fill(
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/9b054ace04a8aa21364bde899385112e8c6af2e5/src/PanelData.jl#L2-L35" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/5faeb3e704b567c33dd3eef7c43492095f8b855a/src/PanelData.jl#L2-L35" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -161,7 +161,7 @@ result_df = tabulate(df, :country, out=:df)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/9b054ace04a8aa21364bde899385112e8c6af2e5/src/StataUtils.jl#L18-L72" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/5faeb3e704b567c33dd3eef7c43492095f8b855a/src/StataUtils.jl#L18-L72" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -208,7 +208,7 @@ winsorize(
 This code is based on Matthieu Gomez winsorize function in the `statar` R package 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/9b054ace04a8aa21364bde899385112e8c6af2e5/src/Winsorize.jl#L2-L28" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/5faeb3e704b567c33dd3eef7c43492095f8b855a/src/Winsorize.jl#L2-L28" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -244,7 +244,7 @@ b = xtile(sales, 10, weights=Weights(repeat([1], length(sales))) );
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/9b054ace04a8aa21364bde899385112e8c6af2e5/src/StataUtils.jl#L436-L454" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/eloualiche/BazerData.jl/blob/5faeb3e704b567c33dd3eef7c43492095f8b855a/src/StataUtils.jl#L436-L454" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
