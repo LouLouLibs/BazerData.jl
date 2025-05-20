@@ -45,12 +45,13 @@ df = DataFrame(x = [1, 2, 2, "NA", missing], y = ["c", "c", "b", "z", "d"])
 tabulate(df, [:x, :y], group_type = :type) # only types for all group variables
 tabulate(df, [:x, :y], group_type = [:value, :type]) # mix value and types
 ```
-I have not implemented all the features of the stata tabulate function, but I am open to [suggestions](#3).
+I have not implemented all the features of the stata tabulate function, but I am open to suggestions.
+
 
 
 ### xtile
 
-See the [doc](https://eloualiche.github.io/BazerData.jl/dev/man/xtile_guide) or the [tests](test/UnitTests/xtile.jl) for examples.
+See the [doc](https://eloualiche.github.io/BazerData.jl/dev/man/xtile_guide) or the [tests](https://github.com/eloualiche/BazerData.jl/blob/main/test/UnitTests/xtile.jl) for examples.
 ```julia
 sales = rand(10_000);
 a = xtile(sales, 10);
