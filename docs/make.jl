@@ -2,7 +2,7 @@
 
 
 push!(LOAD_PATH, "../src/")
-import Pkg; Pkg.develop(path="..")
+# import Pkg; Pkg.develop(path="..")
 # locally : julia --color=yes --project make.jl
 
 # -- 
