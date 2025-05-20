@@ -122,7 +122,10 @@ Winsorize multiple variables
 var_to_winsorize = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm"]
 transform!(df, 
     var_to_winsorize .=> (x -> winsorize(x, probs=(0.1, 0.9)) ) .=> var_to_winsorize .* "_w")
-show(IOContext(stdout, :limit => true, :displaysize => (20, 100)), df, allcols=true, allrows=false)
+show(IOContext(stdout, :limit => true, :displaysize => (20, 100)), 
+    select(df, :species, :island, :bill_length_mm, :bill_length_mm_w, 
+               :bill_depth_mm, :bill_depth_mm_w, :flipper_length_mm, :flipper_length_mm_w),
+    allcols=true, allrows=false)
 nothing; # hide
 ```
 
@@ -131,7 +134,9 @@ Winsorize on one side only
 # left-winsorizing only, at 1th percentile; 
 # cap noi gstats winsor wage, cuts(1 100); gstats winsor wage, cuts(1 100) s(_w2)
 transform!(df, :body_mass_g => (x -> winsorize(x, probs=(0.1, 1)) ) => :body_mass_g_w )
-show(IOContext(stdout, :limit => true, :displaysize => (20, 100)), df, allcols=true, allrows=false)
+show(IOContext(stdout, :limit => true, :displaysize => (20, 100)), 
+    select(df, :species, :island, :body_mass_g, :body_mass_g_w), 
+    allcols=true, allrows=false)
 nothing; # hide
 ```
 
