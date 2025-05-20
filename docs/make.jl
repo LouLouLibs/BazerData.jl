@@ -15,11 +15,17 @@ makedocs(
     # format = Documenter.HTML(),
     format = MarkdownVitepress(
         repo = "https://github.com/eloualiche/BazerData.jl",
+        devurl = "dev",
+        devbranch = "build",
+        deploy_url = "eloualiche.github.io/BazerData.jl",
+        description = "BazerData.jl",
     ),
     repo = Remotes.GitHub("eloualiche", "BazerData.jl"),
     sitename = "BazerData.jl",
     modules  = [BazerData],
     authors = "Erik Loualiche",
+    version = "0.7.1",
+    # version = "dev",
     pages=[
         "Home" => "index.md",
         "Manual" => [
@@ -43,6 +49,7 @@ deploydocs(;
     devbranch = "main",
     branch = "gh-pages",
     push_preview = true,
+    # versions = ["dev"]  # This specifies which versions to deploy
 )
 
 

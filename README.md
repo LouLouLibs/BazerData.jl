@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/eloualiche/BazerData.jl/graph/badge.svg?token=53QO3HSSRT)](https://codecov.io/gh/eloualiche/BazerData.jl)
+[![codecov](https://codecov.io/gh/eloualiche/BazerData.jl/graph/badge.svg?token=6TOSLA6XY9)](https://codecov.io/gh/eloualiche/BazerData.jl)
+
 
 `BazerData.jl` is a placeholder package for some functions that I use in julia frequently.
 
