@@ -53,7 +53,7 @@ version = "1.11.0"
 deps = ["ColorSchemes", "Crayons", "DataFrames", "Dates", "Interpolations", "Missings", "PrettyTables", "Random", "StatsBase"]
 path = ".."
 uuid = "9777a11d-2328-4b97-9b51-b265bb408da6"
-version = "0.7.1"
+version = "0.7.2"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"

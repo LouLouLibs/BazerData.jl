@@ -3,6 +3,16 @@
 # --------------------------------------------------------------------------------------------------
 
 
+# ```@example
+# julia> x = [1, 2, 3]
+# julia> t = [1, 2, 3]
+# julia> tlag(x, t, n = 1)
+# 3-element Vector{Union{Missing, Int64}}:
+#   missing
+#  1
+#  2
+
+
 # --------------------------------------------------------------------------------------------------
 """
     tlag(x, t_vec; n = nothing, checksorted = true, verbose = false)
@@ -38,10 +48,14 @@ backward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```jldoctest
-x = [1, 2, 3, 4, 5]
-t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
-tlag(x, t, n = Day(1))  # Returns: [missing, 1, 2, 3, 4]
+```@example
+x = [1, 2, 3]
+t = [1, 2, 3]
+tlag(x, t, n = 1)
+3-element Vector{Union{Missing, Int64}}:
+  missing
+ 1
+ 2
 ```
 
 """
@@ -137,10 +151,14 @@ forward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```jldoctest
-x = [1, 2, 3, 4, 5]
-t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
-tlead(x, t, n = Day(1))  # Returns: [2, 3, 4, 5, missing]
+```@example
+x = [1, 2, 3]
+t = [8, 9, 10]
+tlead(x, t, n = 1)
+3-element Vector{Union{Missing, Int64}}:
+ 2
+ 3
+  missing
 ```
 
 """
@@ -226,14 +244,24 @@ by a specified amount `n`. Acts as a unified interface to `tlag` and `tlead`.
 - If `n` is not specified, issues a warning and defaults to a lag operation
 
 # Examples
-```jldoctest
-x = [1, 2, 3, 4, 5]
-t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
-tshift(x, t, n = Day(1))   # Lag: [missing, 1, 2, 3, 4]
-tshift(x, t, n = -Day(1))  # Lead: [2, 3, 4, 5, missing]
+```@example
+x = [1, 2, 3];
+t = [-3, -2, -1];
+tshift(x, t, n = 1)
+3-element Vector{Union{Missing, Int64}}:
+  missing
+ 1
+ 2
+
+tshift(x, t, n = -1)  
+3-element Vector{Union{Missing, Int64}}:
+ 2
+ 3
+  missing
+
 ```
 
-See also: tlag, tlead
+See also: [`tlag`](@ref), [`tlead`](@ref)
 """
 function tshift(x, t_vec; n=nothing, kwargs...)
     
