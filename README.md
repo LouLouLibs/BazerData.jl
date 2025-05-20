@@ -13,6 +13,7 @@ So far the package provides a four functions
   2. create category based on quantile ([`xtile`](#xtile))
   3. winsorize some data ([`winsorize`](#winsorize-data))
   4. fill unbalanced panel data ([`panel_fill`](#filling-an-unbalanced-panel))
+  5. lead and lag functions ([`tlead|tlag`](#leads-and-lags))
 
 Note that as the package grow in different directions, dependencies might become overwhelming.
 The readme serves as documentation; there might be more examples inside of the test folder.
@@ -104,7 +105,41 @@ panel_fill(df_panel, :id, :t, [:v1, :v2, :v3],
     gap=Month(1), method=:linear, uniquecheck=true, flag=true, merge=true)
 ```
 
+### Leads and lags
+This is largely "borrowed" (copied) from @FuZhiyu [`PanelShift.jl`](https://github.com/FuZhiyu/PanelShift.jl) package.
 
+```julia
+t, v = [1;2;4], [1;2;3];
+julia> tlag(t, v) # the default lag period is the unitary difference in t, here 1
+3-element Vector{Union{Missing, Int64}}:
+  missing
+ 1
+  missing
+
+
+julia> tlag(t, v, 2) # we can also specify lags using the third argument
+3-element Vector{Union{Missing, Int64}}:
+  missing
+  missing
+ 2
+
+
+julia> using Dates;
+julia> t = [Date(2020,1,1); Date(2020,1,2); Date(2020,1,4)];
+julia> tlag(t, [1, 2, 3]) # customized types of the time vector are also supported 
+3-element Vector{Union{Missing, Int64}}:
+  missing
+ 1
+  missing
+
+
+julia> tlag(t, [1, 2, 3], Day(2)) # specify two-day lags
+3-element Vector{Union{Missing, Int64}}:
+  missing
+  missing
+ 2
+
+```
 
 
 ## Other stuff
