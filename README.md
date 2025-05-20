@@ -128,3 +128,4 @@ See my other package
   - [BazerUtils.jl](https://github.com/eloualiche/BazerUtils.jl) which groups together data wrangling functions.
   - [FinanceRoutines.jl](https://github.com/eloualiche/FinanceRoutines.jl) which is more focused and centered on working with financial data.
   - [TigerFetch.jl](https://github.com/eloualiche/TigerFetch.jl) which simplifies downloading shape files from the Census.
+  - [Prototypes.jl](https://github.com/eloualiche/Prototypes.jl) which used to host all these functions

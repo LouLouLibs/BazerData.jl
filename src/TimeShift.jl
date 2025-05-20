@@ -38,10 +38,12 @@ backward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```julia
+```jldoctest
 x = [1, 2, 3, 4, 5]
 t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
 tlag(x, t, n = Day(1))  # Returns: [missing, 1, 2, 3, 4]
+```
+
 """
 function tlag(x, t_vec; 
     n = nothing, 
@@ -135,10 +137,12 @@ forward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```julia
+```jldoctest
 x = [1, 2, 3, 4, 5]
 t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
 tlead(x, t, n = Day(1))  # Returns: [2, 3, 4, 5, missing]
+```
+
 """
 function tlead(x, t_vec; 
     n = nothing, 
@@ -222,11 +226,12 @@ by a specified amount `n`. Acts as a unified interface to `tlag` and `tlead`.
 - If `n` is not specified, issues a warning and defaults to a lag operation
 
 # Examples
-```julia
+```jldoctest
 x = [1, 2, 3, 4, 5]
 t = [Date(2023,1,1), Date(2023,1,2), Date(2023,1,3), Date(2023,1,4), Date(2023,1,5)]
 tshift(x, t, n = Day(1))   # Lag: [missing, 1, 2, 3, 4]
 tshift(x, t, n = -Day(1))  # Lead: [2, 3, 4, 5, missing]
+```
 
 See also: tlag, tlead
 """
