@@ -10,8 +10,9 @@ import StatsBase: quantile, Weights, sample
 using StreamToString
 
 const testsuite = [
-    "tabulate", "xtile", "winsorize", "panel_fill", 
-    "timeshift"
+    "tabulate", 
+    "xtile", "winsorize", 
+    "panel_fill", "timeshift"
 ]
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true # for data loading of PalmerPenguins

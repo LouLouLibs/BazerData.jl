@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------------------
 """
-    panel_fill(
+    panel_fill!(
         df::DataFrame,
         id_var::Symbol, 
         time_var::Symbol, 
@@ -25,7 +25,6 @@
     email me for other interpolations (anything from Interpolations.jl is possible)
 - `uniquecheck::Bool = true`: check if panel is clean
 - `flag::Bool = false`: flag the interpolated values
-- `merge::Bool = false`: merge the new values with the input dataset
 
 # Returns
 - `AbstractDataFrame`: 
@@ -33,17 +32,15 @@
 # Examples
 - See tests
 """
-function panel_fill(
+function panel_fill!(
     df::DataFrame,
     id_var::Symbol, time_var::Symbol, value_var::Union{Symbol, Vector{Symbol}};
     gap::Union{Int, DatePeriod} = 1, 
     method::Symbol = :backwards, 
     uniquecheck::Bool = true,
     flag::Bool = false,
-    merge::Bool = false
     )
  
-
     # prepare the data
     sort!(df, [id_var, time_var])
     if isa(value_var, Symbol) 
@@ -136,24 +133,24 @@ function panel_fill(
         transform!(df_fill, time_var_r => time_var)
     end
 
-    if merge 
-        if flag
-            df[!, :flag] .= :original
-        end
-        return sort(vcat(df, df_fill, cols=:union), [id_var, time_var])
-    else 
-        return df_fill
+    if flag
+        df[!, :flag] .= :original
     end
+
+    append!(df, df_fill, cols=:union)
+    sort!(df, [id_var, time_var])
+
+    return df
 
 end
 
 
 """ 
-    panel_fill!(...)
+    panel_fill(...)
 
-    Same as panel_fill but with modification in place
+    Same as panel_fill but without modification in place in place
 """    
-function panel_fill!(
+function panel_fill(
     df::DataFrame,
     id_var::Symbol, time_var::Symbol, value_var::Union{Symbol, Vector{Symbol}};
     gap::Union{Int, DatePeriod} = 1, 
@@ -162,12 +159,13 @@ function panel_fill!(
     flag::Bool = false
     )
 
-    df_fill = panel_fill(df, id_var, time_var, value_var,
-        gap = gap, method = method, uniquecheck = uniquecheck, flag = flag)
-    append!(df, df_fill, cols=:union)
-    sort!(df, [id_var, time_var])
+    df_res = copy(df)
 
-    return nothing
+    panel_fill!(df_res, id_var, time_var, value_var,
+        gap = gap, method = method, uniquecheck = uniquecheck, flag = flag)
+    
+    return df_res
+
 
 end
 
