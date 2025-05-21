@@ -48,10 +48,8 @@ backward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```@example
-x = [1, 2, 3]
-t = [1, 2, 3]
-tlag(x, t, n = 1)
+```jldoctest
+julia> tlag([1, 2, 3], [1, 2, 3], n = 1)
 3-element Vector{Union{Missing, Int64}}:
   missing
  1
@@ -151,10 +149,8 @@ forward in time by a specified amount `n`.
 - If `n` has a type that doesn't match the difference type of `t_vec`
 
 # Examples
-```@example
-x = [1, 2, 3]
-t = [8, 9, 10]
-tlead(x, t, n = 1)
+```jldoctest
+julia> tlead([1, 2, 3], [8, 9, 10], n = 1)
 3-element Vector{Union{Missing, Int64}}:
  2
  3
@@ -244,16 +240,14 @@ by a specified amount `n`. Acts as a unified interface to `tlag` and `tlead`.
 - If `n` is not specified, issues a warning and defaults to a lag operation
 
 # Examples
-```@example
-x = [1, 2, 3];
-t = [-3, -2, -1];
-tshift(x, t, n = 1)
+```jldoctest
+julia> tshift([1, 2, 3], [-3, -2, -1], n = 1)
 3-element Vector{Union{Missing, Int64}}:
   missing
  1
  2
 
-tshift(x, t, n = -1)  
+julia> tshift([1, 2, 3], [-3, -2, -1], n = -1)
 3-element Vector{Union{Missing, Int64}}:
  2
  3

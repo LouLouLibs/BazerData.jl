@@ -11,6 +11,10 @@ using Documenter
 using DocumenterVitepress
 
 # -- 
+DocMeta.setdocmeta!(BazerData, :DocTestSetup, :(using BazerData); 
+    recursive=true)
+
+# -- 
 makedocs(
     format = Documenter.HTML(
         size_threshold = 512_000,          # KiB — raise above your largest file
