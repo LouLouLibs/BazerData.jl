@@ -27,11 +27,12 @@
     @testset "DF1" begin
         df1_test = panel_fill(df1, :id, :t, :a,
             gap=1, method=:backwards, uniquecheck=true, flag=true)
-        @test isequal(select(df1_test, :a),
-                        DataFrame(a = [0.0, 1.0, 1.0]))
+        @test isequal(
+            select(subset(df1_test, :flag => ByRow(==(:backwards))), :a),
+            DataFrame(a = [1.0, 1.0, 0.0]))
         # TODO clean up this t est
         df1_test = panel_fill(df1, :id, :t, :a,
-            gap=1, method=:backwards, uniquecheck=true, flag=true, merge=true)
+            gap=1, method=:backwards, uniquecheck=true, flag=true)
         @test isequal(nrow(df1_test), 8)
     end
 
@@ -39,11 +40,12 @@
     @testset "DF2" begin
         df2_test = panel_fill(df2, :id, :t, [:v1, :v2, :v3],
             gap=1, method=:backwards, uniquecheck=true, flag=true)
-        @test isequal(select(df2_test, r"v"),
-                    DataFrame(v1 = [0.0, 1.0, 1.0], v2 = [4.0, 1.0, 1.], v3 = [15.0, 1.0, 1.0]))
+        @test isequal(
+            select(subset(df2_test, :flag => ByRow(==(:backwards))), r"v"),
+            DataFrame(v1 = [1.0, 1.0, 0.0], v2 = [1.0, 1.0, 4.0], v3 = [1.0, 1.0, 15.0]))
 
         df2_test = panel_fill(df2, :id, :t, :v1,
-            gap=1, method=:backwards, uniquecheck=true, flag=true, merge=true)
+            gap=1, method=:backwards, uniquecheck=true, flag=true)
         @test isequal((nrow(df2_test), nrow(filter(:v2 => !ismissing, df2_test))),
                     (10, 7))
     end
@@ -54,9 +56,11 @@
         # test with dates backwards
         df3_test = panel_fill(df3, :id, :t, [:v1, :v2, :v3],
             gap=Month(1), method=:backwards, uniquecheck=true, flag=true)
-        @test isequal(select(df3_test, :v1, :v2, :v3),
-                    DataFrame(v1 = [4.0, 11.0, 0.0, 1.0, 1.0], v2 = [2.0, 3.0, 4.0, 1.0, 1.0],
-                                v3 = [22.5, 17.2, 15.0, 1.0, 1.0]))
+        @test isequal(
+            select(subset(df3_test, :flag => ByRow(==(:backwards))), r"v"),
+            DataFrame(v1 = [1.0, 1.0, 0.0, 4.0, 11.0], 
+                      v2 = [1.0, 1.0, 4.0, 2.0, 3.0],
+                      v3 = [1.0, 1.0, 15.0, 22.5, 17.2]))
 
         # test in place with dates forwards and only fill some variables and not others
         df3_test = copy(df3)
@@ -68,16 +72,21 @@
 
         # linear interpolation
         df3_test = panel_fill(df3, :id, :t, [:v1, :v2, :v3],
-            gap=Month(1), method=:linear, uniquecheck=true, flag=true, merge=false)
-        @test isapprox(select(df3_test, r"v"),
-                    DataFrame(v1 = [7.5 , 12.0, 0.0, 1.0, 1.0], v2 = [2.5, 3.5, 4.5, 1.333, 1.666],
-                                v3 = [19.85, 9.1, 13.625, 2.3333, 3.666]),
-                    atol = 0.01)
+            gap=Month(1), method=:linear, uniquecheck=true, flag=true)
+        @test isapprox(
+            select(subset(df3_test, :flag => ByRow(==(:linear)), skipmissing=true), r"v") ,
+            DataFrame(
+                v1 = [1.0, 1.0, 0.0, 7.5 , 12.0], 
+                v2 = [1.333, 1.666, 4.5, 2.5, 3.5],
+                v3 = [2.3333, 3.666, 13.625, 19.85, 9.1]),
+            atol = 0.01)
 
         # nearest
         df3_test = panel_fill(df3, :id, :t, :v1,
-            gap=Month(1), method=:nearest, uniquecheck=true, flag=true, merge=false)
-        @test isequal(select(df3_test, :v1), DataFrame(v1 = [11.0, 13.0, 0.0, 1.0, 1.0]))
+            gap=Month(1), method=:nearest, uniquecheck=true, flag=true)
+        @test isequal(
+            select(subset(df3_test, :flag => ByRow(==(:nearest)), skipmissing=true), :v1),
+            DataFrame(v1 = [1.0, 1.0, 0.0, 11.0, 13.0]))
 
         # TODO clean up these tests
 
@@ -86,7 +95,7 @@
         # panel_fill(df3, :id, :t, [:v1, :v2, :v3],
             # gap=Month(2), method=:backwards, uniquecheck=true, flag=true, merge=true)
         df3_test = panel_fill(df3, :id, :t, [:v1, :v2, :v3],
-            gap=Day(10), method=:forwards, uniquecheck=true, flag=true, merge=true)
+            gap=Day(10), method=:forwards, uniquecheck=true, flag=true)
         @test isequal(nrow(df3_test) , 39)
 
     end
