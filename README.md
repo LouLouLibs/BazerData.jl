@@ -20,11 +20,11 @@ The readme serves as documentation; there might be more examples inside of the t
 
 ## Installation
 
-`BazerData.jl` is a not yet a registered package.
-You can install it from github  via
+`BazerData.jl` is a a registered package. You can install it from github  via the julia package manager
 ```julia
-import Pkg
-Pkg.add(url="https://github.com/eloualiche/BazerData.jl")
+import Pkg; Pkg.add("BazerData.jl")
+# or in package mode in the REPL
+pkg> add BazerData 
 ```
 
 
