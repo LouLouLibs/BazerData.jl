@@ -1,8 +1,8 @@
 # BazerData
 
-[![CI](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml)
-[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/eloualiche/BazerData.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/eloualiche/BazerData.jl/graph/badge.svg?token=6TOSLA6XY9)](https://codecov.io/gh/eloualiche/BazerData.jl)
+[![CI](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml)
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/louloulibs/BazerData.jl/graph/badge.svg?token=6TOSLA6XY9)](https://codecov.io/gh/eloualiche/BazerData.jl)
 
 
 `BazerData.jl` is a placeholder package for some functions that I use in julia frequently.
@@ -74,7 +74,7 @@ xtile(cities, 10)
 This is fairly standard and I offer options to specify probabilities or cutpoints; moreover you can replace the values that are winsorized with a missing, the cutpoints, or some specific values.
 There is a [`winsor`](https://juliastats.org/StatsBase.jl/stable/robust/#StatsBase.winsor) function in StatsBase.jl but I think it's a little less full-featured.
 
-See the doc for [examples](https://eloualiche.github.io/BazerData.jl/dev/man/winsorize_guide)
+See the doc for [examples](https://louloulibs.github.io/BazerData.jl/dev/man/winsorize_guide)
 ```julia
 df = DataFrame(PalmerPenguins.load())
 winsorize(df.flipper_length_mm, probs=(0.05, 0.95)) # skipmissing by default
