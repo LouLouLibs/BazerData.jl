@@ -2,8 +2,7 @@
 
 [![CI](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/louloulibs/BazerData.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/louloulibs/BazerData.jl/graph/badge.svg?token=6TOSLA6XY9)](https://codecov.io/gh/eloualiche/BazerData.jl)
-
+[![codecov](https://codecov.io/gh/LouLouLibs/BazerData.jl/graph/badge.svg?token=AQR1GHLLHG)](https://codecov.io/gh/LouLouLibs/BazerData.jl)
 
 `BazerData.jl` is a placeholder package for some functions that I use in julia frequently.
 
@@ -58,7 +57,7 @@ I have not implemented all the features of the stata tabulate function, but I am
 
 ### xtile
 
-See the [doc](https://eloualiche.github.io/BazerData.jl/dev/man/xtile_guide) or the [tests](test/UnitTests/xtile.jl) for examples.
+See the [doc](https://louloulibs.github.io/BazerData.jl/dev/man/xtile_guide) or the [tests](test/UnitTests/xtile.jl) for examples.
 ```julia
 sales = rand(10_000);
 a = xtile(sales, 10);
