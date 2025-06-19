@@ -54,7 +54,7 @@ makedocs(
 
 
 deploydocs(;
-    repo = "github.com/eloualiche/BazerData.jl",
+    repo = "github.com/louloulibs/BazerData.jl",
     target = "build", # this is where Vitepress stores its output
     # devbranch = "main",
     branch = "gh-pages",
@@ -64,13 +64,6 @@ deploydocs(;
 
 
 deploydocs(;
-    repo = "github.com/eloualiche/BazerData.jl",
+    repo = "github.com/louloulibs/BazerData.jl",
     devbranch = "build",
 )
-
-# deploydocs(;
-#     repo = "github.com/eloualiche/BazerData.jl",
-#     target = "build",
-#     branch = "gh-pages",
-# )
-

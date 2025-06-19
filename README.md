@@ -20,12 +20,15 @@ The readme serves as documentation; there might be more examples inside of the t
 
 ## Installation
 
-`BazerData.jl` is a a registered package. You can install it from github  via the julia package manager
+`BazerData.jl` is now a registered package. You can install from the main julia registry via the julia package manager
 ```julia
-import Pkg; Pkg.add("BazerData.jl")
+> import Pkg; Pkg.add("BazerData.jl")
 # or in package mode in the REPL
 pkg> add BazerData 
+# or from the main github branch
+> import Pkg; Pkg.add("https://github.com/louloulibs/BazerData.jl#main")
 ```
+
 
 
 ## Usage
@@ -125,7 +128,6 @@ tlag(x, t, n=Day(2)) # specify two-day lags
 
 
 See my other package 
-  - [BazerUtils.jl](https://github.com/eloualiche/BazerUtils.jl) which groups together data wrangling functions.
-  - [FinanceRoutines.jl](https://github.com/eloualiche/FinanceRoutines.jl) which is more focused and centered on working with financial data.
-  - [TigerFetch.jl](https://github.com/eloualiche/TigerFetch.jl) which simplifies downloading shape files from the Census.
-  - [Prototypes.jl](https://github.com/eloualiche/Prototypes.jl) which used to host all these functions
+  - [BazerUtils.jl](https://github.com/louloulibs/BazerUtils.jl) which groups together data wrangling functions.
+  - [FinanceRoutines.jl](https://github.com/louloulibs/FinanceRoutines.jl) which is more focused and centered on working with financial data.
+  - [TigerFetch.jl](https://github.com/louloulibs/TigerFetch.jl) which simplifies downloading shape files from the Census.
