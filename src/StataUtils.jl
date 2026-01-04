@@ -159,7 +159,7 @@ function tabulate(
 
         # highlighter with gradient for the freq/pct/cum columns (rest is blue)
         col_highlighters = vcat(
-            map(i -> (hl_col(i, crayon"cyan bold")), 1:N_COLS),
+            map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_COLS),
             hl_custom_gradient(cols=(N_COLS+1), colorscheme=:Oranges_9, scale=maximum(df_out.freq)),
             hl_custom_gradient(cols=(N_COLS+2), colorscheme=:Greens_9,  scale=ceil(Int, maximum(df_out.pct))),
             hl_custom_gradient(cols=(N_COLS+3), colorscheme=:Greens_9, scale=100),
@@ -280,11 +280,11 @@ function tabulate(
             #   total by for the sum col
 
             col_highlighters = vcat(
-                map(i -> (hl_col(i, crayon"cyan bold")), 1:N_GROUP_COLS),
-                [ hl_custom_gradient(cols=i, colorscheme=:Greens_9, 
+                map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
+                [ hl_custom_gradient(cols=i, colorscheme=:Greens_9,
                         scale = ceil(Int, maximum(skipmissing(df_out[1:end-1, i]))))
                   for i in  range(1+N_GROUP_COLS; length=N_VAR_COLS) ],
-                hl_col(size(df_out, 2), crayon"green")
+                Highlighter((data, row, col) -> col == size(df_out, 2), crayon"green")
             )
            
             formatters = vcat( 
@@ -301,8 +301,8 @@ function tabulate(
         elseif format_stat == :pct
 
             col_highlighters = vcat(
-                map(i -> (hl_col(i, crayon"cyan bold")), 1:N_GROUP_COLS),
-                [ hl_custom_gradient(cols=i, colorscheme=:Greens_9, 
+                map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
+                [ hl_custom_gradient(cols=i, colorscheme=:Greens_9,
                         scale = ceil(Int, maximum(skipmissing(df_out[:, i]))) )
                   for i in  range(1+N_GROUP_COLS; length=N_VAR_COLS) ],
             )

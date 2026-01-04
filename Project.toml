@@ -1,7 +1,7 @@
 name = "BazerData"
 uuid = "d6d9bf1d-14ee-42c9-93f7-cccc2a9ff2c2"
 authors = ["Erik Loualiche"]
-version = "0.7.5"
+version = "0.7.6"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
