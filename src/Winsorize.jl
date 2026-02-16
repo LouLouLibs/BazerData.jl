@@ -1,30 +1,29 @@
 # ------------------------------------------------------------------------------------------
 """
-    winsorize(
-        x::AbstractVector; 
-        probs::Union{Tuple{Real, Real}, Nothing} = nothing,
-        cutpoints::Union{Tuple{Real, Real}, Nothing} = nothing,
-        replace::Symbol = :missing
-        verbose::Bool=false
-    )
+    winsorize(x::AbstractVector;
+        probs=nothing, cutpoints=nothing, replace_value=nothing,
+        IQR=3, verbose=false)
+
+Winsorize (clip extreme values) in a vector.
+Based on Matthieu Gomez's winsorize function in the `statar` R package.
 
 # Arguments
 - `x::AbstractVector`: a vector of values
 
 # Keywords
-- `probs::Union{Tuple{Real, Real}, Nothing}`: A vector of probabilities that can be used instead of cutpoints
-- `cutpoints::Union{Tuple{Real, Real}, Nothing}`: Cutpoints under and above which are defined outliers. Default is (median - five times interquartile range, median + five times interquartile range). Compared to bottom and top percentile, this takes into account the whole distribution of the vector
-- `replace_value::Tuple`:  Values by which outliers are replaced. Default to cutpoints. A frequent alternative is missing. 
-- `IQR::Real`: when inferring cutpoints what is the multiplier from the median for the interquartile range. (median ± IQR * (q75-q25))
-- `verbose::Bool`: printing level
+- `probs::Union{Tuple{Real, Real}, Nothing}`: Probability bounds for cutpoints (e.g., `(0.05, 0.95)`)
+- `cutpoints::Union{Tuple{Real, Real}, Nothing}`: Explicit cutpoints for outlier thresholds.
+    Default is `(median - IQR*(q75-q25), median + IQR*(q75-q25))`
+- `replace_value`: Values to replace outliers with. Default: cutpoint values.
+    Can be a tuple `(lo, hi)`, `missing`, or `(missing, missing)`
+- `IQR::Real=3`: Multiplier from the median for the interquartile range when inferring cutpoints
+- `verbose::Bool=false`: Print informational messages
 
 # Returns
-- `AbstractVector`: A vector the size of x with substituted values 
+- `AbstractVector`: A vector the size of x with substituted values
 
 # Examples
 - See tests
-
-This code is based on Matthieu Gomez winsorize function in the `statar` R package 
 """
 function winsorize(x::AbstractVector{T}; 
     probs::Union{Tuple{Real, Real}, Nothing} = nothing,

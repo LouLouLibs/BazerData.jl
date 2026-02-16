@@ -15,11 +15,11 @@ The readme serves as documentation; there might be more examples inside of the t
 
 ## Installation
 
-`BazerData.jl` is a not yet a registered package.
-You can install it from github  via
+`BazerData.jl` is a registered package.
+You can install it via
 ```julia
 import Pkg
-Pkg.add(url="https://github.com/eloualiche/BazerData.jl")
+Pkg.add("BazerData")
 ```
 
 
@@ -96,11 +96,11 @@ df_panel = DataFrame(        # missing t=2 for id=1
     v3 = [1,5,4,6,6,15,12.25, 21,22.5,17.2,1])
 
 panel_fill(df_panel, :id, :t, [:v1, :v2, :v3],
-    gap=Month(1), method=:backwards, uniquecheck=true, flag=true, merge=true)
+    gap=Month(1), method=:backwards, uniquecheck=true, flag=true)
 panel_fill(df_panel, :id, :t, [:v1, :v2, :v3],
-    gap=Month(1), method=:forwards, uniquecheck=true, flag=true, merge=true)
+    gap=Month(1), method=:forwards, uniquecheck=true, flag=true)
 panel_fill(df_panel, :id, :t, [:v1, :v2, :v3],
-    gap=Month(1), method=:linear, uniquecheck=true, flag=true, merge=true)
+    gap=Month(1), method=:linear, uniquecheck=true, flag=true)
 ```
 
 ### Leads and lags

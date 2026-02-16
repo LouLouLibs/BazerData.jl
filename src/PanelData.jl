@@ -2,14 +2,13 @@
 """
     panel_fill!(
         df::DataFrame,
-        id_var::Symbol, 
-        time_var::Symbol, 
+        id_var::Symbol,
+        time_var::Symbol,
         value_var::Union{Symbol, Vector{Symbol}};
-        gap::Union{Int, DatePeriod} = 1, 
-        method::Symbol = :backwards, 
+        gap::Union{Int, DatePeriod} = 1,
+        method::Symbol = :backwards,
         uniquecheck::Bool = true,
-        flag::Bool = false,
-        merge::Bool = false
+        flag::Bool = false
     )
 
 # Arguments
@@ -17,17 +16,16 @@
 - `id_var::Symbol`: the individual index dimension of the panel
 - `time_var::Symbol`: the time index dimension of the panel (must be integer or a date)
 - `value_var::Union{Symbol, Vector{Symbol}}`: the set of columns we would like to fill
-        
+
 # Keywords
 - `gap::Union{Int, DatePeriod} = 1` : the interval size for which we want to fill data
 - `method::Symbol = :backwards`: the interpolation method to fill the data
     options are: `:backwards` (default), `:forwards`, `:linear`, `:nearest`
-    email me for other interpolations (anything from Interpolations.jl is possible)
 - `uniquecheck::Bool = true`: check if panel is clean
 - `flag::Bool = false`: flag the interpolated values
 
 # Returns
-- `AbstractDataFrame`: 
+- `DataFrame`: the input DataFrame with interpolated rows appended
 
 # Examples
 - See tests
@@ -43,7 +41,7 @@ function panel_fill!(
  
     # prepare the data
     sort!(df, [id_var, time_var])
-    if isa(value_var, Symbol) 
+    if value_var isa Symbol
         value_var = [value_var]
     end
     if uniquecheck # check for unicity 
@@ -52,11 +50,11 @@ function panel_fill!(
     end
 
     time_var_r = join([string(time_var), "rounded"], "_") # clean up if dates
-    if typeof(gap) <: DatePeriod
-        if !(eltype(df.t) <: Dates.AbstractTime)
+    if gap isa DatePeriod
+        if !(eltype(df[!, time_var]) <: Dates.AbstractTime)
             error(
                 """
-                Type of gap $(typeof(gap)) and type of time variable $(eltype(df.t)) do not match
+                Type of gap $(typeof(gap)) and type of time variable $(eltype(df[!, time_var])) do not match
                 """
             )
         else

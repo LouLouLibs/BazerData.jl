@@ -51,5 +51,51 @@
     @test isequal(xtile(s_m, 3), [1, 1, 2, missing, 1, missing, 3])
     @test isequal(xtile(s_m, 20), [1, 2, 4, missing, 2, missing, 5])
 
+end
+
+
+@testset "xtile - edge cases" begin
+
+    # all-missing input
+    x_all_missing = Vector{Union{Int64, Missing}}(fill(missing, 10))
+    result = xtile(x_all_missing, 4)
+    @test all(ismissing, result)
+    @test length(result) == 10
+
+    # single-element vector: searchsortedlast puts the value at the last quantile
+    result = xtile([42.0], 5)
+    @test length(result) == 1
+    @test result[1] isa Int
+
+    result = xtile([42], 5)
+    @test length(result) == 1
+
+    result = xtile(["hello"], 3)
+    @test length(result) == 1
+
+    # single-element with missing wrapper
+    x_single_m = Union{Int, Missing}[7]
+    result = xtile(x_single_m, 3)
+    @test length(result) == 1
+    @test !ismissing(result[1])
+
+    # two-element vector: results should be valid bin indices
+    result = xtile([1.0, 2.0], 2)
+    @test length(result) == 2
+    @test result[1] < result[2]  # lower value gets lower bin
+
+    # all identical values: all should get the same bin
+    x_same = fill(5.0, 100)
+    result = xtile(x_same, 10)
+    @test allequal(result)
+    @test length(result) == 100
+
+    # n_quantiles == 1: only the max element gets bin 1 (searchsortedlast behavior)
+    result = xtile(rand(50), 1)
+    @test all(r -> r in (0, 1), result)
+
+    # large n_quantiles: bins are bounded by n_quantiles
+    result = xtile(rand(100), 10)
+    @test all(r -> 0 <= r <= 10, result)
 
 end
