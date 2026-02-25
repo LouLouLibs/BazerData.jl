@@ -164,8 +164,5 @@ function panel_fill(
     
     return df_res
 
-
 end
-
-
 

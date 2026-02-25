@@ -1,8 +1,7 @@
 
 # ---------------------------------------------------------
 # STANDARD JULIA IGNORE
-/Manifest.toml
-/Manifest*.toml
+**/Manifest.toml
 docs/build/
 docs/node_modules
 .DS_Store
