@@ -25,6 +25,86 @@ function _validate_tshift_args(x, t_vec; n=nothing, checksorted=true, verbose=fa
 
     return n, N
 end
+
+
+# Linear scan on native types (integers — already fast)
+function _scan_lag!(x_shift, x, t_vec, n, N)
+    j = 0
+    @inbounds for i in 1:N
+        target = t_vec[i] - n
+        while j < N && t_vec[j + 1] <= target
+            j += 1
+        end
+        if j > 0 && t_vec[j] == target
+            x_shift[i] = x[j]
+        end
+    end
+    return x_shift
+end
+
+function _scan_lead!(x_shift, x, t_vec, n, N)
+    j = 0
+    @inbounds for i in 1:N
+        target = t_vec[i] + n
+        if target > t_vec[N]
+            break
+        end
+        while j < N && t_vec[j + 1] < target
+            j += 1
+        end
+        if j + 1 <= N && t_vec[j + 1] == target
+            x_shift[i] = x[j + 1]
+        end
+    end
+    return x_shift
+end
+
+
+# Pre-computed Int64 scan for Date types.
+# Date arithmetic (especially Month/Year) is expensive; converting to Int64
+# first keeps the hot scan loop in pure integer comparisons.
+function _scan_lag_int64!(x_shift, x, t_vec, n, N)
+    int_times   = Vector{Int64}(undef, N)
+    int_targets = Vector{Int64}(undef, N)
+    @inbounds for i in 1:N
+        int_times[i]   = Dates.value(t_vec[i])
+        int_targets[i] = Dates.value(t_vec[i] - n)
+    end
+    j = 0
+    @inbounds for i in 1:N
+        target = int_targets[i]
+        while j < N && int_times[j + 1] <= target
+            j += 1
+        end
+        if j > 0 && int_times[j] == target
+            x_shift[i] = x[j]
+        end
+    end
+    return x_shift
+end
+
+function _scan_lead_int64!(x_shift, x, t_vec, n, N)
+    int_times   = Vector{Int64}(undef, N)
+    int_targets = Vector{Int64}(undef, N)
+    @inbounds for i in 1:N
+        int_times[i]   = Dates.value(t_vec[i])
+        int_targets[i] = Dates.value(t_vec[i] + n)
+    end
+    j = 0
+    @inbounds for i in 1:N
+        target = int_targets[i]
+        if target > int_times[N]
+            break
+        end
+        while j < N && int_times[j + 1] < target
+            j += 1
+        end
+        if j + 1 <= N && int_times[j + 1] == target
+            x_shift[i] = x[j + 1]
+        end
+    end
+    return x_shift
+end
 # --------------------------------------------------------------------------------------------------
 
 
@@ -51,7 +131,6 @@ backward in time by a specified amount `n`.
 # Notes
 - Time vectors must be strictly sorted (ascending order)
 - The time gap `n` must be positive
-- Uses linear scan to match time points
 - For `Date` types, no type checking is performed on `n`
 - Elements at the beginning will be `missing` if they don't have values from `n` time units ago
 - See PanelShift.jl for original implementation
@@ -83,22 +162,15 @@ function tlag(x, t_vec;
     n, N = _validate_tshift_args(x, t_vec; n=n, checksorted=checksorted, verbose=verbose)
 
     x_shift = Array{Union{Missing, eltype(x)}}(missing, N)
-    _linear_scan!(x_shift, x, t_vec, n, N)
 
-    return x_shift
-end
-
-function _linear_scan!(x_shift, x, t_vec, n, N)
-    j = 0
-    @inbounds for i in 1:N
-        lagt = t_vec[i] - n
-        while j < N && t_vec[j + 1] <= lagt
-            j += 1
-        end
-        if j > 0 && t_vec[j] == lagt
-            x_shift[i] = x[j]
-        end
+    # Month/Year arithmetic is expensive; pre-compute Int64 targets for those.
+    # Day and integer arithmetic is cheap; scan directly.
+    if n isa Dates.OtherPeriod
+        _scan_lag_int64!(x_shift, x, t_vec, n, N)
+    else
+        _scan_lag!(x_shift, x, t_vec, n, N)
     end
+
     return x_shift
 end
 # --------------------------------------------------------------------------------------------------
@@ -127,7 +199,6 @@ forward in time by a specified amount `n`.
 # Notes
 - Time vectors must be strictly sorted (ascending order)
 - The time gap `n` must be positive
-- Uses linear scan to match time points
 - For `Date` types, no type checking is performed on `n`
 - Elements at the end will be `missing` if they don't have values from `n` time units in the future
 - See PanelShift.jl for original implementation
@@ -159,26 +230,13 @@ function tlead(x, t_vec;
     n, N = _validate_tshift_args(x, t_vec; n=n, checksorted=checksorted, verbose=verbose)
 
     x_shift = Array{Union{Missing, eltype(x)}}(missing, N)
-    _linear_scan_lead!(x_shift, x, t_vec, n, N)
-    return x_shift
-end
 
-function _linear_scan_lead!(x_shift, x, t_vec, n, N)
-    j = 0
-
-    @inbounds for i in 1:N
-        leadt = t_vec[i] + n
-        if leadt > t_vec[N]
-            break
-        end
-
-        while j < N && t_vec[j + 1] < leadt
-            j += 1
-        end
-        if j + 1 <= N && t_vec[j + 1] == leadt
-            x_shift[i] = x[j + 1]
-        end
+    if n isa Dates.OtherPeriod
+        _scan_lead_int64!(x_shift, x, t_vec, n, N)
+    else
+        _scan_lead!(x_shift, x, t_vec, n, N)
     end
+
     return x_shift
 end
 # --------------------------------------------------------------------------------------------------
