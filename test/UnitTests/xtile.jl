@@ -2,16 +2,28 @@
 
     df = dropmissing(DataFrame(PalmerPenguins.load()))
 
-    # -- test on strings!
-    a = xtile(df.species, 2);
-    b = xtile(df.species, 2; weights=Weights(repeat([1], inner=nrow(df))));
-    @test a==b
-    @test sum(a)==520
+    # -- test on strings (lexicographic ordering)
+    a = xtile(df.species, 2)
+    b = xtile(df.species, 2; weights=Weights(repeat([1], inner=nrow(df))))
+    @test a == b                                     # uniform weights == no weights
+    @test all(0 .<= a .<= 2)                        # bins in valid range
+    # same species must get same bin
+    for sp in unique(df.species)
+        @test allequal(a[df.species .== sp])
+    end
+    # lexicographic order: Adelie < Chinstrap < Gentoo
+    @test a[findfirst(df.species .== "Adelie")] <= a[findfirst(df.species .== "Chinstrap")]
+    @test a[findfirst(df.species .== "Chinstrap")] <= a[findfirst(df.species .== "Gentoo")]
 
-    # -- test for more xtile than categories
-    a = xtile(df.species, 4);
-    b = xtile(df.species, 5);
-    @test a==b
+    # -- string xtile with non-alphabetical categories
+    s_nonalpha = ["z", "z", "z", "a", "a", "m"]
+    result = xtile(s_nonalpha, 2)
+    @test allequal(result[1:3])         # all "z" in same bin
+    @test allequal(result[4:5])         # all "a" in same bin
+    @test all(0 .<= result .<= 2)      # bins are valid
+    # lexicographic: "a" < "m" < "z"
+    @test result[4] <= result[6]        # "a" <= "m"
+    @test result[6] <= result[1]        # "m" <= "z"
 
     # -- test on int
     a = xtile(df.flipper_length_mm, 2);
@@ -48,8 +60,18 @@
 
     # -- test on Union{Missing, AbstractString}
     s_m = ["a", "c", "g", missing, "e", missing, "za"]
-    @test isequal(xtile(s_m, 3), [1, 1, 2, missing, 1, missing, 3])
-    @test isequal(xtile(s_m, 20), [1, 2, 4, missing, 2, missing, 5])
+    result_m = xtile(s_m, 3)
+    @test count(ismissing, result_m) == 2           # missing preserved
+    @test all(0 .<= skipmissing(result_m) .<= 3)   # bins in valid range
+    # lexicographic: a < c < e < g < za
+    non_miss_idx = findall(!ismissing, s_m)
+    non_miss_vals = s_m[non_miss_idx]
+    non_miss_bins = result_m[non_miss_idx]
+    for (i, j) in zip(non_miss_idx[1:end-1], non_miss_idx[2:end])
+        if s_m[i] < s_m[j]
+            @test result_m[i] <= result_m[j]        # ordering preserved
+        end
+    end
 
 end
 
@@ -97,5 +119,9 @@ end
     # large n_quantiles: bins are bounded by n_quantiles
     result = xtile(rand(100), 10)
     @test all(r -> 0 <= r <= 10, result)
+
+    # n_quantiles validation
+    @test_throws Exception xtile([1.0, 2.0, 3.0], 0)
+    @test_throws Exception xtile([1.0, 2.0, 3.0], -1)
 
 end

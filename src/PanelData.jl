@@ -67,58 +67,56 @@ function panel_fill!(
         df[!, time_var_r] .= df[!, time_var]
     end
 
+    if method == :backwards
+        interpolate_method = BSpline(Constant(Previous))
+    elseif method == :forwards
+        interpolate_method = BSpline(Constant(Next))
+    elseif method == :nearest
+        interpolate_method = BSpline(Constant())
+    elseif method == :linear
+        interpolate_method = BSpline(Linear())
+    else
+        error(
+            """
+            Method $method not available.
+            Please choose from :backwards (default), :forwards, :nearest, :linear
+            """
+            )
+    end
+
     gdf = groupby(df, [id_var])
-    df_fill = DataFrame();
+    fill_chunks = DataFrame[]
 
     for id_gdf in eachindex(gdf)
         subdf = gdf[id_gdf]
-        sub_fill = DataFrame()
 
-        if method == :backwards
-            interpolate_method = BSpline(Constant(Previous))
-        elseif method == :forwards
-            interpolate_method = BSpline(Constant(Next)) #     # Next-neighbor interpolation
-        elseif method == :nearest 
-            interpolate_method = BSpline(Constant())  # Nearest-neighbor interpolation
-        elseif method == :linear
-            interpolate_method = BSpline(Linear())
-        else
-            error(
-                """
-                Method $method not available.
-                Please choose from :backwards (default), :forwards, :nearest, :linear
-                """
-                )
-        end
-        
-        if nrow(subdf)>1 # condition for filling: at least one open
+        if nrow(subdf) > 1
             sort!(subdf, time_var_r)
             rowdf_init = subdf[1, :]
             for rowdf in eachrow(subdf)[2:end]
-                
-                old_t = rowdf_init[time_var_r] # initialize the iteration
-                enum_t = rowdf[time_var_r] 
-                
+
+                old_t = rowdf_init[time_var_r]
+                enum_t = rowdf[time_var_r]
+
                 t_fill = collect(range(old_t, enum_t, step=sign(enum_t-old_t) * gap))[2:end-1]
                 group_fill = DataFrame(
                     Dict(Symbol(time_var_r) => t_fill, id_var => id_gdf[1]))
                 N_fill = nrow(group_fill)
-                scale_xs = range(1, 2, N_fill+2)[2:end-1]  # the scaling matrix
+                scale_xs = range(1, 2, N_fill+2)[2:end-1]
 
-                # this builds the interpolator and home made scales
                 interp_dict = Dict(
-                    v => interpolate([rowdf_init[v], rowdf[v]], interpolate_method) 
+                    v => interpolate([rowdf_init[v], rowdf[v]], interpolate_method)
                     for v in value_var)
                 var_fill = DataFrame(
                     Dict(v => interp_dict[v].(scale_xs) for v in value_var))
 
-                # process the iteration and move on
-                sub_fill = vcat(sub_fill, hcat(group_fill, var_fill))
-                rowdf_init = rowdf;
+                push!(fill_chunks, hcat(group_fill, var_fill))
+                rowdf_init = rowdf
             end
         end
-        df_fill = vcat(sub_fill, df_fill)   
     end
+
+    df_fill = isempty(fill_chunks) ? DataFrame() : vcat(fill_chunks...)
     
     # clean up the output
     if flag 

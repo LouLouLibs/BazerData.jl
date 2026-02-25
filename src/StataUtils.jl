@@ -227,6 +227,7 @@ end
 
 # ----- Wide format rendering
 function _tabulate_render_wide(df_out, new_cols, N_COLS, format_stat, out)
+    format_stat ∈ (:freq, :pct) || error("format_stat must be :freq or :pct, got :$format_stat")
     df_out = unstack(df_out,
         new_cols[1:(N_COLS-1)], new_cols[N_COLS], format_stat,
         allowmissing=true)
@@ -409,25 +410,18 @@ function xtile(
     return searchsortedlast.(Ref(cuts), data)
 end
 
-# String version
+# String version: use lexicographic rank, then delegate to numeric xtile
 function xtile(
     data::AbstractVector{T},
     n_quantiles::Integer;
     weights::Union{Weights{<:Real}, Nothing} = nothing
 )::Vector{Int} where T <: AbstractString
 
-    if weights === nothing
-        weights = UnitWeights{Int}(length(data))
-    end
-    # Assign weights to each category
-    category_weights = [sum(weights[data .== category]) for category in unique(data)]
-    # Sort categories based on the weighted cumulative sum
-    sorted_categories = sortperm(category_weights, rev=true)
-    step = max(1, round(Int, length(sorted_categories) / n_quantiles))
-    cuts = unique(data)[sorted_categories][1:step:end]
+    sorted_cats = sort(unique(data))
+    rank_map = Dict(cat => i for (i, cat) in enumerate(sorted_cats))
+    ranks = [rank_map[d] for d in data]
 
-    return searchsortedlast.(Ref(cuts), data)
-
+    return xtile(ranks, n_quantiles; weights=weights)
 end
 
 # Dealing with missing and Numbers

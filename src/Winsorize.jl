@@ -63,7 +63,7 @@ function winsorize(x::AbstractVector{T};
     if any(ismissing.(replace_value))
         y = Vector{Union{T, Missing}}(x)  # Make a copy of x that can also store missing values
     else
-        y = Vector{Union{T, eltype(replace_value)}}(x) # TODO could be faster using views here ...
+        y = Vector{Union{T, eltype(replace_value)}}(x)
     end
     
     y[findall(skipmissing(x .< cutpoints[1]))] .= replace_value[1];

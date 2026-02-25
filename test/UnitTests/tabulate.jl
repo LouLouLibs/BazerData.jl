@@ -164,3 +164,10 @@ end
     @test nrow(df_tab) == 3
     @test sum(df_tab.freq) == 6
 end
+
+
+@testset "Tabulate - invalid format_stat in wide" begin
+    df = dropmissing(DataFrame(PalmerPenguins.load()))
+    @test_throws Exception tabulate(df, [:island, :species],
+        format_tbl=:wide, format_stat=:invalid, out=:df)
+end

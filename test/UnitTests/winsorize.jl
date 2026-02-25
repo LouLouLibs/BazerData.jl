@@ -109,3 +109,13 @@ end
     # probs path uses skipmissing which will be empty - quantile on empty should error
     @test_throws Exception winsorize(x_all_missing, probs=(0.05, 0.95))
 end
+
+
+@testset "winsorize - error paths" begin
+    # empty vector
+    @test_throws Exception winsorize(Float64[])
+
+    # invalid probability bounds
+    @test_throws Exception winsorize([1.0, 2.0, 3.0], probs=(-0.1, 0.9))
+    @test_throws Exception winsorize([1.0, 2.0, 3.0], probs=(0.1, 1.1))
+end
