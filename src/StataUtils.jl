@@ -83,7 +83,7 @@ function tabulate(
             @warn "Converting format_tbl to :long"
             format_tbl = :long
         else
-            @error "Table format_tbl must be :long or :wide"
+            error("Table format_tbl must be :long or :wide")
         end
     end
 
@@ -118,9 +118,9 @@ function _tabulate_compute(df, cols, group_type, reorder_cols)
             (d -> combine(groupby(d, name_type_cols), nrow => :freq, proprow =>:pct))
         new_cols = name_type_cols
     elseif group_type isa Vector{Symbol}
-        !all(s -> s in [:value, :type], group_type) && (@error group_type_error_msg)
+        !all(s -> s in [:value, :type], group_type) && error(group_type_error_msg)
         (size(group_type, 1) != size(cols, 1)) &&
-            (@error "\ngroup_type and cols must be the same size; \nsee help for more information")
+            error("group_type and cols must be the same size; see help for more information")
         type_cols = cols[group_type .== :type]
         name_type_cols = Symbol.(type_cols, "_typeof")
         group_cols = [cols[group_type .== :value]; name_type_cols]
@@ -128,7 +128,7 @@ function _tabulate_compute(df, cols, group_type, reorder_cols)
             (d -> combine(groupby(d, group_cols), nrow => :freq, proprow =>:pct))
         new_cols = group_cols
     else
-        @error group_type_error_msg
+        error(group_type_error_msg)
     end
     # resort columns based on the original order
     new_cols = sort(new_cols isa Symbol ? [new_cols] : new_cols,
@@ -397,6 +397,7 @@ function xtile(
 )::Vector{Int} where T <: Real
 
         N = length(data)
+        n_quantiles < 1 && error("n_quantiles must be >= 1")
         n_quantiles > N && (@warn "More quantiles than data")
 
         probs = range(0, 1, length=n_quantiles + 1)[2:end]

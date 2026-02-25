@@ -33,10 +33,12 @@ function winsorize(x::AbstractVector{T};
     verbose::Bool=false
     ) where T
 
+    isempty(x) && error("input vector is empty")
+
     if !isnothing(probs)
-        lower_percentile = max(minimum(probs), 0)
-        upper_percentile = min(maximum(probs), 1)
-        (lower_percentile<0 || upper_percentile>1) && @error "bad probability input"
+        (minimum(probs) < 0 || maximum(probs) > 1) && error("probabilities must be in [0, 1]")
+        lower_percentile = minimum(probs)
+        upper_percentile = maximum(probs)
         verbose && any(ismissing, x) && (@info "Some missing data skipped in winsorizing")
         verbose && !isnothing(cutpoints) && (@info "input cutpoints ignored ... using probabilities")
 

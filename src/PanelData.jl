@@ -59,7 +59,7 @@ function panel_fill!(
             )
         else
             df[!, time_var_r] .= floor.(df[!, time_var], gap)
-            if !(df[!, time_var_r] == df[!, time_var])
+            if !isequal(df[!, time_var_r], df[!, time_var])
                 @warn "Using rounded time variables for consistency with gap: $gap"
             end
         end
@@ -86,7 +86,7 @@ function panel_fill!(
             error(
                 """
                 Method $method not available.
-                Please choose from :backwards, :forwards, :nearest, :linear (default)
+                Please choose from :backwards (default), :forwards, :nearest, :linear
                 """
                 )
         end
@@ -124,7 +124,7 @@ function panel_fill!(
     if flag 
         df_fill[!, :flag] .= method
     end
-    if df[!, time_var_r] == df[!, time_var]
+    if isequal(df[!, time_var_r], df[!, time_var])
         rename!(df_fill, time_var_r => time_var)
         select!(df, Not(time_var_r))
     else # if they are not all the same we are going to fill
@@ -157,7 +157,7 @@ function panel_fill(
     flag::Bool = false
     )
 
-    df_res = copy(df)
+    df_res = deepcopy(df)
 
     panel_fill!(df_res, id_var, time_var, value_var,
         gap = gap, method = method, uniquecheck = uniquecheck, flag = flag)

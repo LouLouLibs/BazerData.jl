@@ -3,14 +3,29 @@
 # --------------------------------------------------------------------------------------------------
 
 
-# ```@example
-# julia> x = [1, 2, 3]
-# julia> t = [1, 2, 3]
-# julia> tlag(x, t, n = 1)
-# 3-element Vector{Union{Missing, Int64}}:
-#   missing
-#  1
-#  2
+# --------------------------------------------------------------------------------------------------
+# Shared validation for tlag/tlead
+function _validate_tshift_args(x, t_vec; n=nothing, checksorted=true, verbose=false)
+    if isnothing(n)
+        n = oneunit(t_vec[1] - t_vec[1])
+        verbose && ((t_vec[1] isa Date) ? (@info "Default date gap inferred ... $n") :
+            (@info "Default gap inferred ... $n"))
+    elseif eltype(t_vec) == Date
+        verbose && @info "No checks on increment argument n for type Date ... "
+    else
+        !(n isa typeof(t_vec[1]-t_vec[1])) &&
+            error("Time gap type does not match time variable: typeof(n)=$(typeof(n)) != eltype(vec)=$(eltype(t_vec))")
+    end
+
+    checksorted && !issorted(t_vec; lt = (<=)) && error("time vector not sorted (order is strict)!")
+    !(n > zero(n)) && error("shift value has to be positive!")
+
+    N = length(t_vec)
+    (length(x) != N) && error("value and time vector have different lengths!")
+
+    return n, N
+end
+# --------------------------------------------------------------------------------------------------
 
 
 # --------------------------------------------------------------------------------------------------
@@ -22,7 +37,7 @@ backward in time by a specified amount `n`.
 
 # Arguments
 - `x`: Array of values to be lagged
-- `t_vec`: Vector of time points corresponding to each element in `x` 
+- `t_vec`: Vector of time points corresponding to each element in `x`
 
 # Keyword Arguments
 - `n`: Time gap for lagging. If `nothing` (default), uses the minimal unit difference between time points.
@@ -57,61 +72,36 @@ julia> tlag([1, 2, 3], [1, 2, 3], n = 1)
 ```
 
 """
-function tlag(x, t_vec; 
-    n = nothing, 
+function tlag(x, t_vec;
+    n = nothing,
     checksorted = true,
     verbose = false,
     )
 
-    if isnothing(n) # this is the default
-        n = oneunit(t_vec[1] - t_vec[1])
-        verbose && ( (t_vec[1] isa Date) ? (@info "Default date gap inferred ... $n") : 
-            (@info "Default gap inferred ... $n") )
-    elseif eltype(t_vec) == Date 
-        verbose && @info "No checks on increment argument n for type Date ... "
-    else
-        !(n isa typeof(t_vec[1]-t_vec[1])) && 
-            error("Time gap type does not match time variable: typeof(n)=$(typeof(n)) != eltype(vec)=$(eltype(t_vec))")
+    isempty(t_vec) && return Array{Union{Missing, eltype(x)}}(missing, 0)
 
-    end
+    n, N = _validate_tshift_args(x, t_vec; n=n, checksorted=checksorted, verbose=verbose)
 
-    checksorted && !issorted(t_vec; lt = (<=) ) && error("time vector not sorted (order is strict)!")
-    !(n > zero(n)) && error("shift value has to be positive!")
-    
-    N = length(t_vec)
-    (length(x) != N) && error("value and time vector have different lengths!")
-
-    x_shift = Array{Union{Missing, eltype(x)}}(missing, N);
-
-    # _binary_search_lag!(x_shift, x, t_vec, n, N)
+    x_shift = Array{Union{Missing, eltype(x)}}(missing, N)
     _linear_scan!(x_shift, x, t_vec, n, N)
 
     return x_shift
-
 end
 
 function _linear_scan!(x_shift, x, t_vec, n, N)
     j = 0
     @inbounds for i in 1:N
-        # Calculate the target time we're looking for
         lagt = t_vec[i] - n
-        # Scan forward from where we left off to find the largest index
-        # where t_vec[j] <= lagt (since t_vec is sorted)
         while j < N && t_vec[j + 1] <= lagt
             j += 1
         end
-
-        # If we found a valid index and it's an exact match
         if j > 0 && t_vec[j] == lagt
             x_shift[i] = x[j]
-        # else
-        #     x_shift[i] = missing
         end
     end
     return x_shift
 end
 # --------------------------------------------------------------------------------------------------
-
 
 
 # --------------------------------------------------------------------------------------------------
@@ -158,57 +148,38 @@ julia> tlead([1, 2, 3], [8, 9, 10], n = 1)
 ```
 
 """
-function tlead(x, t_vec; 
-    n = nothing, 
+function tlead(x, t_vec;
+    n = nothing,
     checksorted = true,
     verbose = false,
     )
 
-    if isnothing(n) # this is the default
-        n = oneunit(t_vec[1] - t_vec[1])
-        verbose && ( (t_vec[1] isa Date) ? (@info "Default date gap inferred ... $n") : 
-            (@info "Default gap inferred ... $n") )
-    elseif eltype(t_vec) == Date 
-        verbose && @info "No checks on increment argument n for date type ... "
-    else
-        !(n isa typeof(t_vec[1]-t_vec[1])) && 
-            error("Time gap type does not match time variable: typeof(n)=$(typeof(n)) != eltype(vec)=$(eltype(t_vec))")
-    end
+    isempty(t_vec) && return Array{Union{Missing, eltype(x)}}(missing, 0)
 
-    checksorted && !issorted(t_vec; lt = (<=) ) && error("time vector not sorted (order is strict)!")
-    !(n > zero(n)) && error("shift value has to be positive!")
-    
-    N = length(t_vec)
-    (length(x) != N) && error("value and time vector have different lengths!")
+    n, N = _validate_tshift_args(x, t_vec; n=n, checksorted=checksorted, verbose=verbose)
 
-    x_shift = Array{Union{Missing, eltype(x)}}(missing, N);
+    x_shift = Array{Union{Missing, eltype(x)}}(missing, N)
     _linear_scan_lead!(x_shift, x, t_vec, n, N)
     return x_shift
-
 end
 
 function _linear_scan_lead!(x_shift, x, t_vec, n, N)
     j = 0
-    
+
     @inbounds for i in 1:N
-        leadt = t_vec[i] + n    
-        # Early termination if already past the end of the array
+        leadt = t_vec[i] + n
         if leadt > t_vec[N]
-            # All remaining targets will be beyond the array bounds
             break
         end
-     
-        # Fast forward scan (can add loop unrolling here if needed)
+
         while j < N && t_vec[j + 1] < leadt
             j += 1
         end
-        # Check for exact match at the next position
         if j + 1 <= N && t_vec[j + 1] == leadt
             x_shift[i] = x[j + 1]
         end
     end
     return x_shift
-
 end
 # --------------------------------------------------------------------------------------------------
 
@@ -225,7 +196,7 @@ by a specified amount `n`. Acts as a unified interface to `tlag` and `tlead`.
 - `t_vec`: Vector of time points corresponding to each element in `x`
 
 # Keyword Arguments
-- `n`: Time gap for shifting. If positive, performs a lag operation (backward in time); 
+- `n`: Time gap for shifting. If positive, performs a lag operation (backward in time);
        if negative, performs a lead operation (forward in time).
        If `nothing` (default), defaults to a lag operation with minimal unit difference.
 - `kwargs...`: Additional keyword arguments passed to either `tlag` or `tlead`
@@ -258,7 +229,7 @@ julia> tshift([1, 2, 3], [-3, -2, -1], n = -1)
 See also: [`tlag`](@ref), [`tlead`](@ref)
 """
 function tshift(x, t_vec; n=nothing, kwargs...)
-    
+
     if isnothing(n)
         @warn "shift not specified ... defaulting to lag"
         n = oneunit(t_vec[1] - t_vec[1])
@@ -271,7 +242,3 @@ function tshift(x, t_vec; n=nothing, kwargs...)
     end
 end
 # --------------------------------------------------------------------------------------------------
-
-
-
-
