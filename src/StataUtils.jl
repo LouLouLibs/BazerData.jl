@@ -158,12 +158,12 @@ function _tabulate_render_long(df_out, new_cols, N_COLS, out, skip_stat)
     transform!(df_out, :freq => (x->text_histogram(x, width=24)) => :freq_hist)
 
     # highlighter with gradient for the freq/pct/cum columns (rest is cyan)
-    col_highlighters = Tuple(vcat(
-        map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_COLS),
+    col_highlighters = vcat(
+        map(i -> TextHighlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_COLS),
         hl_custom_gradient(cols=(N_COLS+1), colorscheme=:Oranges_9, scale=maximum(df_out.freq)),
         hl_custom_gradient(cols=(N_COLS+2), colorscheme=:Greens_9,  scale=ceil(Int, maximum(df_out.pct))),
         hl_custom_gradient(cols=(N_COLS+3), colorscheme=:Greens_9, scale=100),
-    ))
+    )
 
     # when skip_stat is provided and output is string, filter columns
     if out == :string && !isnothing(skip_stat)
@@ -180,48 +180,42 @@ function _tabulate_render_long(df_out, new_cols, N_COLS, out, skip_stat)
             :cum  => (:Greens_9, 100),
         )
 
-        header = vcat(string.(new_cols),
+        column_labels = vcat(string.(new_cols),
             [stat_headers[k] for k in col_stat])
-        formatters = Tuple(vcat(
-            [ft_printf("%s", i) for i in 1:N_COLS],
-            [ft_printf(stat_formats[k], N_COLS + i) for (i, k) in enumerate(col_stat)]
-        ))
+        formatters = vcat(
+            [fmt__printf("%s", 1:N_COLS)],
+            [fmt__printf(stat_formats[k], [N_COLS + i]) for (i, k) in enumerate(col_stat)]
+        )
         # rebuild highlighters for the filtered column layout
-        filtered_highlighters = Tuple(vcat(
-            map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_COLS),
+        filtered_highlighters = vcat(
+            map(i -> TextHighlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_COLS),
             [haskey(stat_colorschemes, k) ?
                 hl_custom_gradient(cols=N_COLS+i, colorscheme=stat_colorschemes[k][1], scale=stat_colorschemes[k][2]) :
-                Highlighter((data, row, col) -> col == N_COLS+i, crayon"white")
+                TextHighlighter((data, row, col) -> col == N_COLS+i, crayon"white")
              for (i, k) in enumerate(col_stat)]
-        ))
+        )
         alignment = vcat(repeat([:l], N_COLS), repeat([:c], N_COL_STAT))
-        cell_alignment = reduce(push!,
-            map(i -> (i,1)=>:l, 1:N_COLS+N_COL_STAT-1),
-            init=Dict{Tuple{Int64, Int64}, Symbol}())
 
         df_render = select(df_out, new_cols, col_stat)
         return _render_pretty_table(df_render, out;
-            hlines=[1], vlines=[N_COLS],
-            alignment=alignment, cell_alignment=cell_alignment,
-            header=header, formatters=formatters, highlighters=filtered_highlighters)
+            vlines=[N_COLS],
+            alignment=alignment,
+            column_labels=column_labels, formatters=formatters, highlighters=filtered_highlighters)
     end
 
     # default: all stat columns
-    header = [string.(new_cols); "Freq."; "Percent"; "Cum"; "Hist."]
-    formatters = Tuple(vcat(
-        [ft_printf("%s", i) for i in 1:N_COLS],
-        [ft_printf("%d", N_COLS+1), ft_printf("%.1f", N_COLS+2),
-         ft_printf("%d", N_COLS+3), ft_printf("%s", N_COLS+4)]
-    ))
+    column_labels = [string.(new_cols); "Freq."; "Percent"; "Cum"; "Hist."]
+    formatters = [
+        fmt__printf("%s", 1:N_COLS),
+        fmt__printf("%d", [N_COLS+1, N_COLS+3]),
+        fmt__printf("%.1f", [N_COLS+2]),
+    ]
     alignment = vcat(repeat([:l], N_COLS), :c, :c, :c, :c)
-    cell_alignment = reduce(push!,
-        map(i -> (i,1)=>:l, 1:N_COLS+3),
-        init=Dict{Tuple{Int64, Int64}, Symbol}())
 
     return _render_pretty_table(df_out, out;
-        hlines=[1], vlines=[N_COLS],
-        alignment=alignment, cell_alignment=cell_alignment,
-        header=header, formatters=formatters, highlighters=col_highlighters)
+        vlines=[N_COLS],
+        alignment=alignment,
+        column_labels=column_labels, formatters=formatters, highlighters=col_highlighters)
 end
 
 
@@ -250,70 +244,79 @@ function _tabulate_render_wide(df_out, new_cols, N_COLS, format_stat, out)
         df_out = hcat(df_out, col_vector)
         rename!(df_out, [i => "-"^i for i in 1:N_GROUP_COLS])
 
-        col_highlighters = Tuple(vcat(
-            map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
+        col_highlighters = vcat(
+            map(i -> TextHighlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
             [ hl_custom_gradient(cols=i, colorscheme=:Greens_9,
                     scale = ceil(Int, maximum(skipmissing(df_out[1:end-1, i]))))
               for i in  range(1+N_GROUP_COLS; length=N_VAR_COLS) ],
-            Highlighter((data, row, col) -> col == size(df_out, 2), crayon"green")
-        ))
+            TextHighlighter((data, row, col) -> col == size(df_out, 2), crayon"green")
+        )
 
-        formatters = Tuple(vcat(
-            [ ft_printf("%s", i) for i in 1:N_GROUP_COLS ],
-            [ ft_printf("%d", j) for j in range(1+N_GROUP_COLS; length=N_VAR_COLS) ],
-            [ ft_printf("%d", 1+N_GROUP_COLS+N_VAR_COLS) ]
-        ))
+        formatters = [
+            fmt__printf("%s", 1:N_GROUP_COLS),
+            fmt__printf("%d", range(1+N_GROUP_COLS; length=N_VAR_COLS+1)),
+        ]
 
-        hlines = [1, size(df_out, 1)]
+        hlines = [size(df_out, 1) - 1]  # separate the totals row
         vlines = [N_GROUP_COLS, N_GROUP_COLS+N_VAR_COLS]
         alignment = vcat(repeat([:l], N_GROUP_COLS), repeat([:c], N_VAR_COLS), [:l])
 
     elseif format_stat == :pct
 
-        col_highlighters = Tuple(vcat(
-            map(i -> Highlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
+        col_highlighters = vcat(
+            map(i -> TextHighlighter((data, row, col) -> col == i, crayon"cyan bold"), 1:N_GROUP_COLS),
             [ hl_custom_gradient(cols=i, colorscheme=:Greens_9,
                     scale = ceil(Int, maximum(skipmissing(df_out[:, i]))) )
               for i in  range(1+N_GROUP_COLS; length=N_VAR_COLS) ],
-        ))
+        )
 
-        formatters = Tuple(vcat(
-            [ ft_printf("%s", i) for i in 1:N_GROUP_COLS ],
-            [ ft_printf("%.1f", j) for j in range(1+N_GROUP_COLS; length=N_VAR_COLS) ]
-        ))
+        formatters = [
+            fmt__printf("%s", 1:N_GROUP_COLS),
+            fmt__printf("%.1f", range(1+N_GROUP_COLS; length=N_VAR_COLS)),
+        ]
 
-        hlines = [1]
+        hlines = Int[]
         vlines = [0, N_GROUP_COLS, N_GROUP_COLS+N_VAR_COLS]
         alignment = vcat(repeat([:l], N_GROUP_COLS), repeat([:c], N_VAR_COLS))
 
     end
 
-    cell_alignment = reduce(push!,
-        map(i -> (i,1)=>:l, 1:N_GROUP_COLS),
-        init=Dict{Tuple{Int64, Int64}, Symbol}())
-
     return _render_pretty_table(df_out, out;
         hlines=hlines, vlines=vlines,
-        alignment=alignment, cell_alignment=cell_alignment,
-        formatters=formatters, highlighters=col_highlighters,
-        show_subheader=false)
+        alignment=alignment, column_labels=names(df_out),  # names only, no eltype row
+        formatters=formatters, highlighters=col_highlighters)
 end
 
 
 # ----- Unified pretty_table output handler (stdout / df / string)
-function _render_pretty_table(df, out::Symbol; show_subheader=true, pt_kwargs...)
+# `hlines`: data rows followed by a horizontal line (one is always drawn under the labels)
+# `vlines`: data columns followed by a vertical line (0 is the left border)
+function _render_pretty_table(df, out::Symbol;
+    hlines::Vector{Int}=Int[], vlines::Vector{Int}=Int[], pt_kwargs...)
+
+    N = size(df, 2)
     common = (
-        border_crayon = crayon"bold yellow",
-        header_crayon = crayon"bold light_green",
-        show_header = true,
-        show_subheader = show_subheader,
+        table_format = TextTableFormat(
+            horizontal_line_at_beginning = false,
+            horizontal_line_after_column_labels = true,
+            horizontal_lines_at_data_rows = hlines,
+            horizontal_line_after_data_rows = false,
+            vertical_line_at_beginning = 0 in vlines,
+            vertical_lines_at_data_columns = filter(j -> 0 < j < N, vlines),
+            vertical_line_after_data_columns = N in vlines),
+        style = TextTableStyle(
+            table_border = crayon"bold yellow",
+            first_line_column_label = crayon"bold light_green"),
+        show_column_labels = true,
     )
 
     if out ∈ [:stdout, :df]
-        pretty_table(df; common..., vcrop_mode=:middle, pt_kwargs...)
+        pretty_table(df; common..., vertical_crop_mode=:middle, pt_kwargs...)
         return out == :stdout ? nothing : df
     else  # :string
-        return pretty_table(String, df; common..., crop=:none, pt_kwargs...)
+        return pretty_table(String, df; common...,
+            fit_table_in_display_horizontally=false, fit_table_in_display_vertically=false,
+            pt_kwargs...)
     end
 end
 # --------------------------------------------------------------------------------------------------
@@ -325,7 +328,7 @@ function hl_custom_gradient(;
     colorscheme::Symbol=:Oranges_9,
     scale::Int=1)
 
-    Highlighter(
+    TextHighlighter(
     (data, i, j) -> j == cols,
     (h, data, i, j) -> begin
         if ismissing(data[i, j])

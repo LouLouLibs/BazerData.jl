@@ -9,7 +9,8 @@ import DataFrames: AbstractDataFrame, ByRow, DataFrame, groupby, combine, nrow, 
 import Dates: format, now, DatePeriod, Dates, Dates.AbstractTime, ISODateTimeFormat
 import Interpolations: Linear, Constant, Previous, Next, BSpline, interpolate
 import Missings: disallowmissing
-import PrettyTables: Crayon, ft_printf, get, Highlighter, pretty_table
+import PrettyTables: Crayon, fmt__printf, pretty_table, TextHighlighter, TextTableFormat,
+    TextTableStyle
 import Random: seed!
 import StatsBase: quantile, UnitWeights, Weights
 # --------------------------------------------------------------------------------------------------
