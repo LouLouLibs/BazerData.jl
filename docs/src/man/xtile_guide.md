@@ -26,7 +26,7 @@ savefig(p1, "p1.svg"); nothing # hide
 
 
 The quintiles split the distribution:
-```@example hist; 
+```@example hist
 x_tile = hcat(x, xtile(x, 5))
 p2 = histogram(x, bins=-4:0.1:4, alpha=0.25, color="grey", 
     label="", framestyle=:box); 
@@ -39,7 +39,7 @@ savefig(p2, "p2.svg"); nothing # hide
 
 
 It is possible to include weights
-```@example hist;
+```@example hist
 x_sorted = sort(x)
 x_tile_weights = xtile(x_sorted, 5, 
                        weights=Weights([ log(i)/i for i in 1:length(x)]) ) 

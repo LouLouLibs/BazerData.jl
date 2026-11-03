@@ -25,7 +25,7 @@ savefig(p1, "p1.svg"); nothing # hide
 
 
 ### Replace the outliers based on quantile
-```@example hist; 
+```@example hist
 x_win = winsorize(x, probs=(0.05, 0.95));
 p2 = histogram(x, bins=-4:0.1:4, color="blue", label="distribution", framestyle=:box); 
 histogram!(x_win, bins=-4:0.1:4, color="red", opacity=0.5, label="winsorized")
@@ -35,7 +35,7 @@ savefig(p2, "p2.svg"); nothing # hide
 
 
 ### One side trim
-```@example hist; 
+```@example hist
 x_win = winsorize(x, probs=(0, 0.8));
 p3 = histogram(x, bins=-4:0.1:4, color="blue", label="distribution", framestyle=:box);
 histogram!(x_win, bins=-4:0.1:4, color="red", opacity=0.5, label="winsorized");
